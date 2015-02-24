@@ -121,6 +121,7 @@ angular.module('dtmf', ['ngTouch'])
 
         $scope.reset = function () {
             DialerSvc.reset();
+            $rootScope.$broadcast('reset');
         };
 
         $scope.dial = function () {

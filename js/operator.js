@@ -8,28 +8,46 @@ angular.module('dtmf')
 
         var ear = new Ear({
             bands: bands,
-            samples: 1024,
-            threshold: -50,
-            decay: 10
+            samples: 2048,
+            threshold: -60,
+            decay: 5
         });
 
         var lastPressed = '', currentPressed = '', listening = false;
 
-        ear.callback = function (freq1, freq2) {
+        ear.callback = function (freqs) {
             //console.log(freq1, freq2);
 
-            if (freq1 === undefined) {
+
+            if (freqs === null) {
                 // This allows two of the same number to be dialed consecutively
                 lastPressed = '';
                 return;
             } else {
-                var row = DialerSvc.rows.indexOf(freq1),
-                    col = DialerSvc.cols.indexOf(freq2);
+                // Split into row and column frequencies
+                var rows = {}, cols = {};
+                _.forEach(freqs, function (amp, freq) {
+                    freq = parseInt(freq);
+                    var rowIndex = DialerSvc.rows.indexOf(freq), colIndex = DialerSvc.cols.indexOf(freq);
 
-                if (col == -1 || row == -1) {
-                    return;
-                }
-                //console.log(row, col);
+                    if (rowIndex !== -1) {
+                        rows[rowIndex] = amp;
+                    } else if (colIndex !== -1) {
+                        cols[colIndex] = amp;
+                    }
+                });
+
+                // Sort by amplitude and key and array of rows and column indices (from frequencies above)
+                var sorter = function (amp) {
+                    return amp;
+                };
+                rows = _.chain(rows).pairs().sortBy(sorter).pluck(0).value();
+                cols = _.chain(cols).pairs().sortBy(sorter).pluck(0).value();
+
+                // Get the loudest of the frequencies
+                // Object keys are strings, convert to int
+                var row = parseInt(rows[0]),
+                    col = parseInt(cols[0]);
 
                 currentPressed = DialerSvc.pad[row][col];
             }
@@ -65,5 +83,9 @@ angular.module('dtmf')
             $scope.$apply(function () {
                 $scope.received += key;
             });
+        });
+
+        $rootScope.$on('reset', function (e, key) {
+            $scope.received = '';
         });
     });

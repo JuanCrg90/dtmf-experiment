@@ -192,10 +192,8 @@ var Ear = (function () {
         });
 
         var result = _.map(peaks, function (amplitude, index) {
-            return this.indices[index];
+            return [this.indices[index], this.buffer[index]];
         }, this);
-
-        //if (result.length) console.log(result);
 
         // We must read exactly TWO frequencies to map the button
         if (result.length >= 2) {
@@ -204,16 +202,17 @@ var Ear = (function () {
                 if (max < threshold + this.decay) {
                     // If the peak is decaying, fire the callback with no arguments to indicate silence
                     // This fixes the debouncing issue
-                    this.callback.apply(this, []);
+                    this.callback(null)
                 }
                 else {
                     // Otherwise, just fire the callback
-                    this.callback.apply(this, result);
+
+                    this.callback(_.object(result));
                 }
             }
         } else if (result.length == 0) {
             // "Silence"
-            if (this.callback) this.callback.apply(this, []);
+            if (this.callback) this.callback(null);
         }
 
         // Register callback for next "animation" frame
