@@ -41,9 +41,9 @@ angular.module('dtmf')
                 var sorter = function (amp) {
                     return amp;
                 };
-                var chain = _(rows).pairs().sortBy(sorter).pluck(0);
-                cols = chain.plant(cols).value();
-                rows = chain.value();
+                var wrapper = _(rows).pairs().sortBy(sorter).pluck(0);
+                cols = wrapper.plant(cols).value();
+                rows = wrapper.value();
 
                 // Get the loudest of the frequencies
                 // Object keys are strings, convert to int
