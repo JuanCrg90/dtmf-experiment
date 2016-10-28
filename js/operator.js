@@ -1,5 +1,54 @@
 var img = {};
 
+generateImage = function(img) {
+
+  // Encontrar el table donde se pintatá la imagen.
+  // Crear una table de height * width
+  // Denormalizar el vector
+  // añadir una celda a la tabla por cada elemento del vector (la celda debe llevar un color de fondo)
+
+  console.log('HOLA GENERATE IMAGE');
+
+  var grid = document.getElementById('dtmf-image');
+  grid.innerHTML = '';
+  var fragment = document.createDocumentFragment();
+
+  //img.width = 24;
+  //img.height = 7;
+  //img.data = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,0,0,7,7,7,7,0,0,11,11,11,11,0,0,15,15,15,15,0,0,3,0,0,0,0,0,7,0,0,0,0,0,11,0,0,0,0,0,15,0,0,15,0,0,3,3,3,0,0,0,7,7,7,0,0,0,11,11,11,0,0,0,15,15,15,15,0,0,3,0,0,0,0,0,7,0,0,0,0,0,11,0,0,0,0,0,15,0,0,0,0,0,3,0,0,0,0,0,7,7,7,7,0,0,11,11,11,11,0,0,15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+
+  var height = img.height;
+  var width = img.width;
+
+  var trow = ''
+
+  for(var y = 0; y < height; y++) {
+    var row = document.createElement('tr');
+
+    for(var x = 0; x < width; x++) {
+      var cell = document.createElement('td');
+      //var element =Math.floor( (img.data[y* width + x] - 1 ) * (255/8) ) || 0;
+      var element =Math.floor( (img.data[x* height + y] - 1 ) * (255/8) ) || 0;
+      //var element = img.data[y* width + x] || 0;
+      cell.innerHTML = ".";
+      cell.style.backgroundColor= 'rgb('+element+','+element+','+element+')';
+      //cell.style.backgroundColor= 'rgb(100,100,100)';
+      row.appendChild(cell);
+
+
+      trow+=element + ' ';
+
+    }
+    fragment.appendChild(row);
+    trow+="\n";
+  }
+
+  grid.appendChild(fragment);
+  console.log(trow)
+
+
+};
+
 angular.module('dtmf')
   .factory('OperatorSvc', function ($rootScope, DialerSvc) {
     var freqs = [].concat(DialerSvc.rows, DialerSvc.cols);
@@ -96,6 +145,7 @@ angular.module('dtmf')
         if(key == '#') {
           console.log("Terminado");
           console.log(img);
+          generateImage(img);
         }
 
         if(key == '*') {
